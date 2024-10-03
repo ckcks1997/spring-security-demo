@@ -2,9 +2,8 @@ package site.companycolor.demo.controller;
 
 
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import site.companycolor.demo.dto.ApiResponse;
 import site.companycolor.demo.dto.AuthenticationRequest;
 import site.companycolor.demo.dto.AuthenticationResponse;
 import site.companycolor.demo.dto.UserDto;
@@ -34,21 +33,23 @@ public class AuthController {
     private UserService userService;
 
     @GetMapping("/me")
-    public ResponseEntity<?> me(Authentication authentication) {
+    public ResponseEntity<ApiResponse<?>> me(Authentication authentication) {
         if (authentication != null && authentication.getPrincipal() instanceof UserDetails) {
             UserDetails userDetails = userDetailsService.loadUserByUsername(((UserDetails) authentication.getPrincipal()).getUsername());
+            UserDto userByUserId = userService.getUserByUserId(userDetails.getUsername());
 
             UserDto userDto = new UserDto();
-            userDto.setName(userDetails.getUsername());
+            userDto.setUserId(userByUserId.getUserId());
+            userDto.setName(userByUserId.getName());
             userDto.setAuthority(userDetails.getAuthorities().iterator().next().getAuthority());
 
-            return ResponseEntity.ok(userDto);
+            return ResponseEntity.ok(ApiResponse.success(userDto));
         }
-        return ResponseEntity.notFound().build();
+        return ResponseEntity.ok(ApiResponse.createSuccessWithNoContent());
     }
 
     @PostMapping("/login")
-    public ResponseEntity<?> createAuthenticationToken(@RequestBody AuthenticationRequest authenticationRequest) throws Exception {
+    public ResponseEntity<ApiResponse<?>> createAuthenticationToken(@RequestBody AuthenticationRequest authenticationRequest) throws Exception {
         authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(authenticationRequest.getUsername(), authenticationRequest.getPassword())
         );
@@ -56,12 +57,12 @@ public class AuthController {
         final UserDetails userDetails = userDetailsService.loadUserByUsername(authenticationRequest.getUsername());
         final String jwt = jwtUtil.generateToken(userDetails);
 
-        return ResponseEntity.ok(new AuthenticationResponse(jwt));
+        return ResponseEntity.ok(ApiResponse.success(new AuthenticationResponse(jwt)));
     }
 
     @PostMapping("/signup")
-    public ResponseEntity<?> signupUser(@RequestBody UserDto userDto) {
+    public ResponseEntity<ApiResponse<?>> signupUser(@RequestBody UserDto userDto) {
         UserDto createdUser = userService.createUser(userDto);
-        return ResponseEntity.ok(createdUser);
+        return ResponseEntity.ok(ApiResponse.success(createdUser));
     }
 }

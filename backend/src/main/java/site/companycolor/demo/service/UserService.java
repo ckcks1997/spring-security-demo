@@ -36,6 +36,20 @@ public class UserService {
         return convertToDto(user);
     }
 
+    public UserDto getUserByUserId(String id) {
+        SystemUser user = userRepository.findByUserId(id)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        return convertToDto(user);
+    }
+
+    public List<UserDto> getUsersByIdAndName(String userId, String userName) {
+        List<SystemUser> users = userRepository.findByUserIdAndName(userId, userName);
+        return users.stream()
+                .map(this::convertToDto)
+                .collect(Collectors.toList());
+    }
+
+
     @Transactional
     public UserDto createUser(UserDto userDto) {
         SystemUser user = convertToEntity(userDto);
