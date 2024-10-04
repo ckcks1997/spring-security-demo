@@ -1,13 +1,11 @@
 package site.companycolor.demo.controller;
 
-
 import site.companycolor.demo.dto.ApiResponse;
 import site.companycolor.demo.dto.UserDto;
 import site.companycolor.demo.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.List;
 
 @RestController
@@ -16,12 +14,6 @@ public class UserController {
 
     @Autowired
     private UserService userService;
-
-//    @GetMapping("/users")
-//    public ResponseEntity<?> userList() {
-//        List<UserDto> users = userService.getAllUsers();
-//        return ResponseEntity.ok(ApiResponse.success(users));
-//    }
 
     @GetMapping("/users")
     public ResponseEntity<?> userList(
@@ -57,6 +49,6 @@ public class UserController {
     @DeleteMapping("/users/{id}")
     public ResponseEntity<ApiResponse<?>> deleteUser(@PathVariable Long id) {
         userService.deleteUser(id);
-        return ResponseEntity.ok(ApiResponse.createSuccessWithNoContent());
+        return ResponseEntity.ok(ApiResponse.success(id));
     }
 }

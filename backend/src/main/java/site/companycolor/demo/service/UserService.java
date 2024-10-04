@@ -19,9 +19,6 @@ public class UserService {
     private SystemUserRepository userRepository;
 
     @Autowired
-    private UserHistoryService userHistoryService;
-
-    @Autowired
     private PasswordEncoder passwordEncoder;
 
     public List<UserDto> getAllUsers() {
@@ -55,7 +52,6 @@ public class UserService {
         SystemUser user = convertToEntity(userDto);
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         user = userRepository.save(user);
-        userHistoryService.saveHistory(user.getId(), "CREATE", UserHistory.ActionType.C);
         return convertToDto(user);
     }
 
@@ -65,14 +61,12 @@ public class UserService {
                 .orElseThrow(() -> new RuntimeException("User not found"));
         user.setName(userDto.getName());
         user = userRepository.save(user);
-        userHistoryService.saveHistory(user.getId(), "UPDATE", UserHistory.ActionType.U);
         return convertToDto(user);
     }
 
     @Transactional
     public void deleteUser(Long id) {
         userRepository.deleteById(id);
-        userHistoryService.saveHistory(id, "DELETE", UserHistory.ActionType.D);
     }
 
     private UserDto convertToDto(SystemUser user) {
@@ -89,7 +83,7 @@ public class UserService {
         user.setUserId(dto.getUserId());
         user.setPassword(dto.getPassword());
         user.setName(dto.getName());
-        user.setAuthority("USER");
+        user.setAuthority(dto.getAuthority()!= null ? dto.getAuthority() : "ROLE_USER");
         return user;
     }
 }

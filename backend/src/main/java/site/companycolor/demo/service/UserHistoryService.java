@@ -13,12 +13,12 @@ public class UserHistoryService {
     @Autowired
     private UserHistoryRepository userHistoryRepository;
 
-    public void saveHistory(Long userId, String url, UserHistory.ActionType actionType) {
+    public void saveHistory(Long userId, String url, UserHistory.ActionType actionType, String ipAddress) {
         UserHistory history = new UserHistory();
         history.setRegUserId(userId);
         history.setUrl(url);
         history.setActionType(actionType);
-        history.setRegIp("0.0.0.0"); // TODO: ip주소 mapping
+        history.setRegIp(ipAddress);
         history.setRegDt(LocalDateTime.now());
 
         userHistoryRepository.save(history);
