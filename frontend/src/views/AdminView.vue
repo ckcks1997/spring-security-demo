@@ -1,11 +1,14 @@
 <template>
   <div class="admin-container">
+    <div class="action-bar">
     <h2>사용자 관리</h2>
+      <el-button type="primary" @click="showAddUserModal">사용자 추가</el-button>
+    </div>
     <el-table :data="users" style="width: 100%">
-      <el-table-column prop="id" label="ID" width="80" />
+      <el-table-column prop="id" label="ID" width="100" />
       <el-table-column prop="userId" label="User ID" width="120" />
-      <el-table-column prop="name" label="User NM" width="120" />
-      <el-table-column prop="authority" label="User AUTH" width="120" />
+      <el-table-column prop="name" label="User NM" width="200" />
+      <el-table-column prop="authority" label="User AUTH" width="150" />
       <el-table-column label="버튼" width="200">
         <template #default="scope">
           <el-button size="small" @click="editUser(scope.row)">수정</el-button>
@@ -14,15 +17,21 @@
       </el-table-column>
     </el-table>
 
-    <el-dialog v-model="editDialogVisible" title="Edit User">
+    <el-dialog v-model="editDialogVisible" :title="isAdding ? '사용자 추가' : '사용자 수정'">
       <el-form :model="editedUser" label-width="120px">
-        <el-form-item label="Name">
+        <el-form-item label="ID" v-if="isAdding">
+          <el-input v-model="editedUser.userId" />
+        </el-form-item>
+        <el-form-item label="이름">
           <el-input v-model="editedUser.name" />
         </el-form-item>
-        <el-form-item label="Authority">
+        <el-form-item label="비밀번호" v-if="isAdding">
+          <el-input v-model="editedUser.password" type="password" />
+        </el-form-item>
+        <el-form-item label="권한">
           <el-select v-model="editedUser.authority">
-            <el-option label="User" value="ROLE_USER" />
-            <el-option label="Admin" value="ROLE_SYSTEM_ADMIN" />
+            <el-option label="User" value="USER" />
+            <el-option label="Admin" value="SYSTEM_ADMIN" />
           </el-select>
         </el-form-item>
       </el-form>
@@ -37,15 +46,20 @@
 </template>
 
 <script setup>
-import {ref, onMounted} from 'vue'
-import {ElMessage, ElMessageBox} from 'element-plus'
-import {api} from '../boot/axios'
+import { ref, onMounted } from 'vue'
+import { ElMessage, ElMessageBox } from 'element-plus'
+import { api } from '../boot/axios'
 
 const users = ref([])
 const editDialogVisible = ref(false)
 const editedUser = ref({})
+const isAdding = ref(false)
 
 onMounted(async () => {
+  await fetchUsers()
+})
+
+const fetchUsers = async () => {
   try {
     const response = await api.get('/admin/users')
     users.value = response.data
@@ -53,26 +67,40 @@ onMounted(async () => {
     console.error('user조회 실패', error)
     ElMessage.error('user조회 실패')
   }
-})
+}
+
+const showAddUserModal = () => {
+  isAdding.value = true
+  editedUser.value = { userId: '', name: '', password: '', authority: 'USER' }
+  editDialogVisible.value = true
+}
 
 const editUser = (user) => {
-  editedUser.value = {...user}
+  isAdding.value = false
+  editedUser.value = { ...user }
   editDialogVisible.value = true
 }
 
 const saveUser = async () => {
   try {
-    await api.put(`/admin/users/${editedUser.value.id}`, editedUser.value)
-    const index = users.value.findIndex(u => u.id === editedUser.value.id)
-    users.value[index] = {...editedUser.value}
+    if (isAdding.value) {
+      await api.post('/admin/users', editedUser.value)
+      ElMessage.success('사용자가 추가되었습니다.')
+    } else {
+      await api.put(`/admin/users/${editedUser.value.id}`, editedUser.value)
+      ElMessage.success('사용자 정보가 업데이트되었습니다.')
+    }
     editDialogVisible.value = false
-    ElMessage.success('user 업데이트 완료')
+    await fetchUsers()
   } catch (error) {
-    console.error('user 업데이트 실패', error)
-    ElMessage.error('user 업데이트 실패')
+    console.error('사용자 저장 실패', error)
+    if (error.response && error.response.data && error.response.data.message) {
+      ElMessage.error(error.response.data.message)
+    } else {
+      ElMessage.error('사용자 저장에 실패했습니다.')
+    }
   }
 }
-
 const deleteUser = async (user) => {
   try {
     await ElMessageBox.confirm('유저를 삭제하시겠습니까?', 'Warning', {
@@ -81,7 +109,7 @@ const deleteUser = async (user) => {
       type: 'warning'
     })
     await api.delete(`/admin/users/${user.id}`)
-    users.value = users.value.filter(u => u.id !== user.id)
+    await fetchUsers()
     ElMessage.success('삭제되었습니다.')
   } catch (error) {
     if (error !== 'cancel') {
@@ -94,6 +122,13 @@ const deleteUser = async (user) => {
 <style scoped>
 .admin-container {
   padding: 20px;
+}
+
+.action-bar {
+  margin-bottom: 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
 .dialog-footer {

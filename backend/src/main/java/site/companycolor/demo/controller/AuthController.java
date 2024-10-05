@@ -1,6 +1,5 @@
 package site.companycolor.demo.controller;
 
-
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import site.companycolor.demo.dto.ApiResponse;

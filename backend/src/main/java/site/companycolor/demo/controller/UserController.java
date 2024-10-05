@@ -36,10 +36,13 @@ public class UserController {
 
     @PostMapping("/users")
     public ResponseEntity<ApiResponse<?>> createUser(@RequestBody UserDto userDto) {
-        UserDto createdUser = userService.createUser(userDto);
-        return ResponseEntity.ok(ApiResponse.success(createdUser));
+        try {
+            UserDto createdUser = userService.createUser(userDto);
+            return ResponseEntity.ok(ApiResponse.success(createdUser));
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(ApiResponse.error(e.getMessage()));
+        }
     }
-
     @PutMapping("/users/{id}")
     public ResponseEntity<ApiResponse<?>> updateUser(@PathVariable Long id, @RequestBody UserDto userDto) {
         UserDto updatedUser = userService.updateUser(id, userDto);

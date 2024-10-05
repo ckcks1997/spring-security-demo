@@ -3,7 +3,7 @@
     <el-card class="box-card">
       <template #header>
         <div class="card-header">
-          <h2>회원 가입 시스템</h2>
+          <h2>회원 시스템</h2>
         </div>
       </template>
       <div v-if="isLoggedIn">

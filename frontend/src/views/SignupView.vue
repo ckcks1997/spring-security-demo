@@ -3,7 +3,7 @@
     <el-card class="box-card">
       <template #header>
         <div class="card-header">
-          <h2>Sign Up</h2>
+          <h2>회원가입</h2>
         </div>
       </template>
       <el-form :model="signupForm" :rules="rules" ref="signupFormRef">
@@ -19,6 +19,8 @@
         <el-form-item prop="confirmPassword">
           <el-input v-model="signupForm.confirmPassword" type="password" placeholder="비밀번호 재입력"></el-input>
         </el-form-item>
+          <p style="font-size: 0.8rem;">참고: 해당 페이지에서는 USER권한의 회원가입만 가능합니다.</p>
+          <p style="font-size: 0.8rem;">Admin 권한의 계정은 Admin 로그인 후 회원관리 페이지에서 생성해 주세요.</p>
         <el-form-item>
           <el-button type="primary" @click="onSubmit">가입</el-button>
         </el-form-item>
@@ -77,11 +79,15 @@ const onSubmit = async () => {
           password: signupForm.password
         })
         if (response.data) {
-          ElMessage.success('로그인 되었습니다')
-          router.push('/login')
+          ElMessage.success('회원가입이 완료되었습니다.')
+          await router.push('/login')
         }
       } catch (error) {
-        ElMessage.error('로그인 오류')
+        if (error.response && error.response.data && error.response.data.message) {
+          ElMessage.error(error.response.data.message)
+        } else {
+          ElMessage.error('회원가입 중 오류가 발생했습니다.')
+        }
       }
     } else {
       return false

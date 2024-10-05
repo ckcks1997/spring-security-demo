@@ -3,7 +3,7 @@
     <el-card class="box-card">
       <template #header>
         <div class="card-header">
-          <h2>Login</h2>
+          <h2>로그인</h2>
         </div>
       </template>
       <el-form :model="loginForm" :rules="rules" ref="loginFormRef">

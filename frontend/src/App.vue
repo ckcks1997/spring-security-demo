@@ -1,9 +1,9 @@
 <template>
   <el-container class="layout-container">
     <el-header>
-      <el-menu mode="horizontal" :router="true">
-        회원 관리 시스템
-        <el-menu-item v-if="isLoggedIn" @click="logout">Logout</el-menu-item>
+      <el-menu mode="horizontal" class="flex align-items-center" :router="true">
+        <h4 @click="router.push('/')">회원 관리 시스템</h4>
+        <el-button type="danger" class="mx-3" v-if="isLoggedIn" @click="logout">로그아웃</el-button>
       </el-menu>
     </el-header>
 

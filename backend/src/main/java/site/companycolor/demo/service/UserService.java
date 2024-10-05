@@ -29,13 +29,13 @@ public class UserService {
 
     public UserDto getUserById(Long id) {
         SystemUser user = userRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new RuntimeException("User를 찾지 못했습니다."));
         return convertToDto(user);
     }
 
     public UserDto getUserByUserId(String id) {
         SystemUser user = userRepository.findByUserId(id)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new RuntimeException("User를 찾지 못했습니다."));
         return convertToDto(user);
     }
 
@@ -49,6 +49,9 @@ public class UserService {
 
     @Transactional
     public UserDto createUser(UserDto userDto) {
+        if (userRepository.findByUserId(userDto.getUserId()).isPresent()) {
+            throw new RuntimeException("User ID가 이미 존재합니다.");
+        }
         SystemUser user = convertToEntity(userDto);
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         user = userRepository.save(user);
@@ -58,7 +61,7 @@ public class UserService {
     @Transactional
     public UserDto updateUser(Long id, UserDto userDto) {
         SystemUser user = userRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new RuntimeException("User를 찾지 못했습니다."));
         user.setName(userDto.getName());
         user = userRepository.save(user);
         return convertToDto(user);
@@ -83,7 +86,7 @@ public class UserService {
         user.setUserId(dto.getUserId());
         user.setPassword(dto.getPassword());
         user.setName(dto.getName());
-        user.setAuthority(dto.getAuthority()!= null ? dto.getAuthority() : "ROLE_USER");
+        user.setAuthority(dto.getAuthority()!= null ? dto.getAuthority() : "USER"); // authority 없을경우 기본 USER 설정
         return user;
     }
 }

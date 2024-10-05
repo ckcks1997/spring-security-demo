@@ -23,6 +23,10 @@ const routes = [
         name: 'Admin 회원관리',
         component: () => import('../views/AdminView.vue'),
         meta: { requiresAuth: true, requiresAdmin: true }
+    },
+    {
+        path: '/:pathMatch(.*)*',
+        redirect: '/'
     }
 ]
 
