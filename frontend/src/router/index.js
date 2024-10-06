@@ -5,7 +5,7 @@ import {useAuthStore} from "../stores/auth.js";
 const routes = [
     {
         path: '/',
-        name: 'Home',
+        name: '메인페이지',
         component: HomeView
     },
     {
@@ -20,7 +20,7 @@ const routes = [
     },
     {
         path: '/admin',
-        name: 'Admin 회원관리',
+        name: '사용자 관리',
         component: () => import('../views/AdminView.vue'),
         meta: { requiresAuth: true, requiresAdmin: true }
     },
@@ -40,9 +40,9 @@ router.beforeEach((to, from, next) => {
 
     if (to.matched.some(record => record.meta.requiresAuth)) {
         if (!authStore.isLoggedIn) {
-            next({ name: 'Login', query: { redirect: to.fullPath } })
+            next({ name: '로그인', query: { redirect: to.fullPath } })
         } else if (to.matched.some(record => record.meta.requiresAdmin) && !authStore.isAdmin) {
-            next({ name: 'Home' })
+            next({ name: '메인페이지' })
         } else {
             next()
         }

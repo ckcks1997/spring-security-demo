@@ -3,6 +3,7 @@ package site.companycolor.demo.aspect;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.JoinPoint;
+import org.aspectj.lang.annotation.After;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Before;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,7 +31,7 @@ public class IpLoggingAspect {
     @Autowired
     private SystemUserRepository systemUserRepository;
 
-    @Before("execution(* site.companycolor.demo.controller.UserController.*(..))")
+    @After("execution(* site.companycolor.demo.service.UserService.*(..))")
     public void logIpAddress(JoinPoint joinPoint) {
         HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
         String ipAddress = IpUtil.getClientIpAddress(request);
@@ -44,7 +45,7 @@ public class IpLoggingAspect {
         } else if (methodName.startsWith("delete")) {
             actionType = UserHistory.ActionType.D;
         } else {
-            actionType = UserHistory.ActionType.C;
+            return;
         }
 
         String userName = getUserIdFromRequest(request);

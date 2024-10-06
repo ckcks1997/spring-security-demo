@@ -40,7 +40,7 @@ const isLoggedIn = computed(() => authStore.isLoggedIn)
 const isAdmin = computed(() => authStore.isAdmin)
 const menuLinks = [
   {
-    title: 'Home',
+    title: '메인페이지',
     icon: HomeFilled,
     link: '/'
   },
@@ -55,17 +55,17 @@ const menuLinks = [
     link: '/signup'
   },
   {
-    title: 'Admin 회원관리',
+    title: '사용자 관리',
     icon: Setting,
     link: '/admin'
   }
 ]
 const visibleLinks = computed(() => {
   if (!isLoggedIn.value) { //비로그인시 로그인/가입만
-    return menuLinks.filter(link => ['Home', '로그인', '회원가입'].includes(link.title))
+    return menuLinks.filter(link => ['메인페이지', '로그인', '회원가입'].includes(link.title))
   } else {//로그인시 로그인/가입 삭제, admin만 admin show
     const links = menuLinks.filter(link => !['로그인', '회원가입'].includes(link.title))
-    return isAdmin.value ? links : links.filter(link => link.title !== 'Admin 회원관리')
+    return isAdmin.value ? links : links.filter(link => link.title !== '사용자 관리')
   }
 })
 

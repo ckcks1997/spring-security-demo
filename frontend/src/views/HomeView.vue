@@ -9,7 +9,7 @@
       <div v-if="isLoggedIn">
         <h3 v-if="!isAdmin">{{ user?.name }}님, 환영합니다!</h3>
         <p v-if="isAdmin">관리자 계정입니다.</p>
-        <el-button v-if="isAdmin" type="success" @click="$router.push('/admin')">Admin 회원관리</el-button>
+        <el-button v-if="isAdmin" type="success" @click="$router.push('/admin')">사용자 관리</el-button>
       </div>
       <div v-else>
         <p>로그인이 필요합니다.</p>

@@ -46,10 +46,10 @@ const signupForm = reactive({
 })
 
 const rules = {
-  userId: [{required: true, message: 'Please input user ID', trigger: 'blur'}],
-  name: [{required: true, message: '값을 입력해주세요', trigger: 'blur'}],
+  userId: [{required: true, message: 'ID를 입력새 주세요', trigger: 'blur'}],
+  name: [{required: true, message: '값을 입력해 주세요', trigger: 'blur'}],
   password: [
-    {required: true, message: 'Please input password', trigger: 'blur'},
+    {required: true, message: '비밀번호를 입력하세요', trigger: 'blur'},
     {min: 8, message: '8자리 이상 입력해 주세요', trigger: 'blur'}
   ],
   confirmPassword: [
