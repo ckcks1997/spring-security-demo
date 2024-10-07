@@ -3,6 +3,7 @@ package site.companycolor.demo.aspect;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.JoinPoint;
+import org.aspectj.lang.annotation.After;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Before;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,7 +31,7 @@ public class IpLoggingAspect {
     @Autowired
     private SystemUserRepository systemUserRepository;
 
-    @Before("execution(* site.companycolor.demo.controller.UserController.*(..))")
+    @After("execution(* site.companycolor.demo.service.UserService.*(..))")
     public void logIpAddress(JoinPoint joinPoint) {
         HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
         String ipAddress = IpUtil.getClientIpAddress(request);
@@ -46,13 +47,16 @@ public class IpLoggingAspect {
         } else {
             return;
         }
-
-        String userName = getUserIdFromRequest(request);
-        Optional<SystemUser> user = systemUserRepository.findByUserId(userName);
-        if (user.isPresent()) {
-            userHistoryService.saveHistory(user.get().getId(), request.getRequestURI(), actionType, ipAddress);
-        } else {
-            log.error("User not found: {}", userName);
+        try {
+            String userName = getUserIdFromRequest(request);
+            Optional<SystemUser> user = systemUserRepository.findByUserId(userName);
+            if (user.isPresent()) {
+                userHistoryService.saveHistory(user.get().getId(), request.getRequestURI(), actionType, ipAddress);
+            } else {
+                log.error("User not found: {}", userName);
+            }
+        } catch (Exception e) {
+            log.error(e.getMessage());
         }
     }
 
